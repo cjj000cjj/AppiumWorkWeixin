@@ -13,9 +13,10 @@ yamlfilepath=os.path.dirname(__file__)+"/yamlfile/contacts.yml"
 with open(yamlfilepath, encoding="utf8") as f:
     # 获取联系人字典
     datas = yaml.safe_load(f)["datas"]
-    # 获取联系人姓名、性别、手机号
-    contact = datas["contact"]
-
+    # 获取添加联系人姓名、性别、手机号
+    addcontact = datas["addcontact"]
+    # 获取删除联系人姓名
+    deletecontact = datas["deletecontact"]
 
 def pytest_collection_modifyitems(
     session: "Session", config: "Config", items: List["Item"]

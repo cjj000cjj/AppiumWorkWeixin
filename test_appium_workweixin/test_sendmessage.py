@@ -3,7 +3,6 @@
 # @time  :2020/11/16:10:12
 # @Author:啊哩哩
 # @File  :test_sendmessage.py
-from time import sleep
 
 import pytest
 from appium import webdriver
@@ -11,7 +10,7 @@ from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from test_appium_workweixin.conftest import contact
+from test_appium_workweixin.conftest import addcontact, deletecontact
 
 
 class TestWorkWeixin:
@@ -100,8 +99,8 @@ class TestWorkWeixin:
         # 首页进入通讯录页面
         self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
 
-    @pytest.mark.parametrize("name, gender, phone", contact)
-    def test_addcontact(self, name, gender, phone):
+    @pytest.mark.parametrize("addname, gender, phone", addcontact)
+    def test_addcontact(self, addname, gender, phone):
         """
         添加联系人
         :return:
@@ -115,7 +114,7 @@ class TestWorkWeixin:
                                  'scrollIntoView(new UiSelector().text("添加成员")'
                                  '.instance(0))').click()
         self.driver.find_element(MobileBy.XPATH, "//*[@text='手动输入添加']").click()
-        self.driver.find_element(MobileBy.XPATH, "//*[contains(@text,'姓名')]/../*[@text='必填']").send_keys(name)
+        self.driver.find_element(MobileBy.XPATH, "//*[contains(@text,'姓名')]/../*[@text='必填']").send_keys(addname)
         self.driver.implicitly_wait(3)
         self.driver.find_element(MobileBy.XPATH, "//*[@text='男']").click()
         if gender == "女":
@@ -136,21 +135,20 @@ class TestWorkWeixin:
         self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/gu_").click()
 
 
-
-    def test_delecontact(self):
+    @pytest.mark.parametrize("deletename", deletecontact)
+    def test_delecontact(self, deletename):
         """
         删除联系人
         :return:
         """
-        searchname = "liche"
         # 首页进入通讯录页面
         self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
         # 查询要删除的联系人
         self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/guu").click()
-        self.driver.find_element(MobileBy.XPATH, "//*[@text='搜索']").send_keys(searchname)
+        self.driver.find_element(MobileBy.XPATH, "//*[@text='搜索']").send_keys(deletename)
         # 手机企业微信这里查询结果出现 比较慢
         # 搜索所有姓名=liche
-        locator1 = (MobileBy.XPATH, f"//*[@text='{searchname}']")
+        locator1 = (MobileBy.XPATH, f"//*[@text='{deletename}']")
         WebDriverWait(self.driver, 10).until(expected_conditions.visibility_of_all_elements_located(locator1))
         elements = self.driver.find_elements(*locator1)
         if len(elements) < 2:
@@ -172,7 +170,7 @@ class TestWorkWeixin:
                                  'scrollIntoView(new UiSelector().text("删除成员")'
                                  '.instance(0))').click()
         self.driver.find_element(MobileBy.XPATH, "//*[@text='确定']").click()
-        deleelement = self.driver.find_elements(MobileBy.XPATH, f"//*[@text='{searchname}']")
+        deleelement = self.driver.find_elements(MobileBy.XPATH, f"//*[@text='{deletename}']")
         assert len(deleelement) == len(elements)-1
 
 
