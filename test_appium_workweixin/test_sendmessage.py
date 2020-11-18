@@ -3,14 +3,29 @@
 # @time  :2020/11/16:10:12
 # @Author:啊哩哩
 # @File  :test_sendmessage.py
+import os
 
 import pytest
+import yaml
 from appium import webdriver
 from appium.webdriver.common.mobileby import MobileBy
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from test_appium_workweixin.conftest import addcontact, deletecontact
+
+def get_contact(self):
+    # 获取绝对路径下的参数文件
+    yamlfilepath = os.path.dirname(__file__) + "./yamlfile/contacts.yml"
+    # 对输入数据和预期结果参数化
+    with open(yamlfilepath, encoding="utf8") as f:
+        # 获取联系人字典
+        datas = yaml.safe_load(f)["datas"]
+        # 获取添加联系人姓名、性别、手机号
+        addcontact = datas["addcontact"]
+        # 获取删除联系人姓名
+        deletecontact = datas["deletecontact"]
+        return [addcontact, deletecontact]
+
 
 
 class TestWorkWeixin:
@@ -95,11 +110,8 @@ class TestWorkWeixin:
         # 判断打卡结果
         assert result == "外出打卡成功"
 
-    def test_addresslist(self):
-        # 首页进入通讯录页面
-        self.driver.find_element(MobileBy.XPATH, "//*[@text='通讯录']").click()
 
-    @pytest.mark.parametrize("addname, gender, phone", addcontact)
+    @pytest.mark.parametrize("addname, gender, phone", get_contact()[0])
     def test_addcontact(self, addname, gender, phone):
         """
         添加联系人
@@ -135,7 +147,7 @@ class TestWorkWeixin:
         self.driver.find_element(MobileBy.ID, "com.tencent.wework:id/gu_").click()
 
 
-    @pytest.mark.parametrize("deletename", deletecontact)
+    @pytest.mark.parametrize("deletename", get_contact()[1])
     def test_delecontact(self, deletename):
         """
         删除联系人
